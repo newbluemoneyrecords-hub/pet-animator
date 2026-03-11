@@ -1,0 +1,216 @@
+<div class="min-h-screen bg-[#f5f5f0] text-stone-900 font-sans p-4 sm:p-8">
+  <div class="max-w-6xl mx-auto space-y-8">
+    <header class="text-center space-y-3 pt-8">
+      <h1 class="text-5xl font-bold tracking-tight text-[#5A5A40] font-serif">Pet Animator Pro</h1>
+      <p class="text-stone-500 text-lg">3D Avatars, Custom Speech & Choreography</p>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Left Column: Controls (Span 7) -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- Section 1: Avatar Generation -->
+        <div class="bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-stone-100 space-y-6">
+          <h2 class="text-2xl font-serif font-semibold text-[#5A5A40] flex items-center gap-2">
+            <mat-icon>face</mat-icon> 1. Create 3D Avatar
+          </h2>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Image Upload -->
+            <div
+              class="border-2 border-dashed border-stone-200 rounded-2xl p-6 text-center hover:bg-[#f5f5f0]/50 transition-colors cursor-pointer relative overflow-hidden group flex flex-col items-center justify-center min-h-[160px]"
+              (click)="fileInput.click()"
+            >
+              @if (imagePreview()) {
+                <div class="absolute inset-0">
+                  <img [src]="imagePreview()" class="w-full h-full object-cover opacity-40 group-hover:opacity-30 transition-opacity" referrerpolicy="no-referrer" />
+                </div>
+                <div class="relative z-10 flex flex-col items-center gap-2">
+                  <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-[#5A5A40]">
+                    <mat-icon>published_with_changes</mat-icon>
+                  </div>
+                  <span class="font-medium text-stone-800 text-sm">Change Photo</span>
+                </div>
+              } @else {
+                <div class="space-y-2 flex flex-col items-center">
+                  <div class="w-12 h-12 bg-[#f5f5f0] rounded-full flex items-center justify-center text-[#5A5A40]">
+                    <mat-icon>add_a_photo</mat-icon>
+                  </div>
+                  <p class="text-sm text-stone-500 font-medium">Upload Pet Photo</p>
+                </div>
+              }
+              <input #fileInput type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)" />
+            </div>
+
+            <!-- Customization Form -->
+            <form [formGroup]="form" class="space-y-4">
+              <div>
+                <input formControlName="breed" type="text" placeholder="Breed (e.g. Golden Retriever)" class="w-full rounded-xl border-stone-200 focus:border-[#5A5A40] focus:ring-[#5A5A40] p-3 bg-[#f5f5f0]/50 border text-sm text-stone-800 outline-none transition-colors" />
+              </div>
+              <div>
+                <input formControlName="furColor" type="text" placeholder="Fur Color (e.g. Neon Pink)" class="w-full rounded-xl border-stone-200 focus:border-[#5A5A40] focus:ring-[#5A5A40] p-3 bg-[#f5f5f0]/50 border text-sm text-stone-800 outline-none transition-colors" />
+              </div>
+              <div>
+                <input formControlName="accessories" type="text" placeholder="Accessories (e.g. Sunglasses, Top Hat)" class="w-full rounded-xl border-stone-200 focus:border-[#5A5A40] focus:ring-[#5A5A40] p-3 bg-[#f5f5f0]/50 border text-sm text-stone-800 outline-none transition-colors" />
+              </div>
+            </form>
+          </div>
+
+          <button
+            (click)="generateAvatar()"
+            [disabled]="!imageBase64() || isGeneratingAvatar()"
+            class="w-full py-3 px-6 bg-stone-800 hover:bg-stone-900 disabled:bg-stone-200 disabled:text-stone-400 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 shadow-sm"
+          >
+            @if (isGeneratingAvatar()) {
+              <mat-icon class="animate-spin">autorenew</mat-icon> Generating 3D Avatar...
+            } @else {
+              <mat-icon>3d_rotation</mat-icon> Generate 3D Avatar
+            }
+          </button>
+        </div>
+
+        <!-- Section 2: Voice & Script -->
+        <div class="bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-stone-100 space-y-6">
+          <h2 class="text-2xl font-serif font-semibold text-[#5A5A40] flex items-center gap-2">
+            <mat-icon>record_voice_over</mat-icon> 2. Voice & Script
+          </h2>
+
+          <form [formGroup]="form" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider">Voice</label>
+                <select formControlName="voice" class="w-full rounded-xl border-stone-200 focus:border-[#5A5A40] focus:ring-[#5A5A40] p-3 bg-[#f5f5f0]/50 border text-sm text-stone-800 outline-none transition-colors">
+                  <option value="Puck">Puck (Quirky)</option>
+                  <option value="Charon">Charon (Deep)</option>
+                  <option value="Kore">Kore (Sweet)</option>
+                  <option value="Fenrir">Fenrir (Gruff)</option>
+                  <option value="Zephyr">Zephyr (Breezy)</option>
+                </select>
+              </div>
+              <div class="space-y-2">
+                <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider">Sound Effect</label>
+                <select formControlName="soundEffect" class="w-full rounded-xl border-stone-200 focus:border-[#5A5A40] focus:ring-[#5A5A40] p-3 bg-[#f5f5f0]/50 border text-sm text-stone-800 outline-none transition-colors">
+                  <option value="none">None</option>
+                  <option value="bark">Bark</option>
+                  <option value="meow">Meow</option>
+                  <option value="chirp">Chirp</option>
+                </select>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider">Script</label>
+              <textarea
+                formControlName="script"
+                rows="2"
+                placeholder="What should your pet say?"
+                class="w-full rounded-xl border-stone-200 focus:border-[#5A5A40] focus:ring-[#5A5A40] p-3 bg-[#f5f5f0]/50 border resize-none text-sm text-stone-800 outline-none transition-colors"
+              ></textarea>
+            </div>
+          </form>
+        </div>
+
+        <!-- Section 3: Choreography -->
+        <div class="bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-stone-100 space-y-6">
+          <h2 class="text-2xl font-serif font-semibold text-[#5A5A40] flex items-center gap-2">
+            <mat-icon>directions_run</mat-icon> 3. Choreography
+          </h2>
+
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider">Available Moves (Click to add)</label>
+              <div class="flex flex-wrap gap-2">
+                @for (move of availableMoves; track move) {
+                  <button (click)="addToSequence(move)" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-sm font-medium transition-colors capitalize">
+                    + {{ move }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider">Dance Sequence (Click to remove)</label>
+              <div class="min-h-[60px] p-4 bg-[#f5f5f0] rounded-xl border border-stone-200 flex flex-wrap gap-2 items-center">
+                @if (danceSequence().length === 0) {
+                  <span class="text-stone-400 text-sm italic">No moves selected. Add some moves!</span>
+                }
+                @for (move of danceSequence(); track $index) {
+                  <button (click)="removeFromSequence($index)" class="px-3 py-1.5 bg-[#5A5A40] hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors capitalize flex items-center gap-1 group">
+                    {{ move }}
+                    <mat-icon class="text-[16px] w-4 h-4 opacity-50 group-hover:opacity-100">close</mat-icon>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Result (Span 5) -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-stone-100 flex flex-col items-center justify-center min-h-[600px] relative overflow-hidden sticky top-8">
+
+          @if (avatarPreview() || imagePreview()) {
+            <div class="relative w-64 h-64 sm:w-80 sm:h-80 mb-8 shrink-0">
+              <img
+                [src]="avatarPreview() || imagePreview()"
+                class="w-full h-full object-cover rounded-full shadow-2xl border-8 border-white transition-transform duration-300"
+                [ngClass]="activeDanceMove() ? 'dance-' + activeDanceMove() : ''"
+                referrerpolicy="no-referrer"
+              />
+
+              <!-- Music notes when dancing -->
+              @if (isPlaying()) {
+                <div class="absolute -top-4 -right-4 text-3xl animate-bounce delay-100">🎵</div>
+                <div class="absolute top-1/2 -left-8 text-4xl animate-bounce delay-300">🎶</div>
+                <div class="absolute -bottom-4 right-8 text-3xl animate-bounce delay-200">✨</div>
+              }
+            </div>
+
+            <div class="w-full space-y-6">
+              <button
+                (click)="generateSpeechAndPlay()"
+                [disabled]="!form.value.script || isGeneratingSpeech()"
+                class="w-full py-4 px-6 bg-[#5A5A40] hover:bg-[#4a4a35] disabled:bg-stone-200 disabled:text-stone-400 disabled:cursor-not-allowed text-white rounded-full font-medium transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.98] text-lg"
+              >
+                @if (isGeneratingSpeech()) {
+                  <mat-icon class="animate-spin">autorenew</mat-icon> Preparing Show...
+                } @else {
+                  <mat-icon>play_circle_filled</mat-icon> Perform!
+                }
+              </button>
+
+              @if (audioUrl()) {
+                <div class="flex justify-center">
+                  <button
+                    (click)="togglePlay()"
+                    class="inline-flex items-center gap-2 px-6 py-2 rounded-full border-2 border-[#5A5A40] text-[#5A5A40] hover:bg-[#5A5A40] hover:text-white font-medium transition-colors"
+                  >
+                    <mat-icon>{{ isPlaying() ? 'stop' : 'replay' }}</mat-icon>
+                    {{ isPlaying() ? 'Stop' : 'Replay' }}
+                  </button>
+                </div>
+              }
+            </div>
+
+          } @else {
+            <div class="text-center text-stone-400 space-y-4 max-w-xs">
+              <div class="w-24 h-24 bg-stone-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <mat-icon class="text-5xl text-stone-300">pets</mat-icon>
+              </div>
+              <h3 class="text-xl font-serif text-stone-600">Waiting for a star</h3>
+              <p class="text-sm">Upload a photo to get started!</p>
+            </div>
+          }
+
+          @if (errorMessage()) {
+            <div class="absolute bottom-4 left-4 right-4 p-4 bg-red-50 text-red-700 rounded-2xl text-sm flex items-start gap-3 shadow-lg">
+              <mat-icon class="text-red-500 shrink-0">error_outline</mat-icon>
+              <p>{{ errorMessage() }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
